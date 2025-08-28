@@ -1,14 +1,18 @@
 import React from "react";
 import Recipe from "../components/Recipe";
 import IngredientsList from "../components/IngredientsList";
+import { getRecipeFromChefClaude } from "../../ai";
+
+const apiKey = import.meta.env.VITE_CLAUDE_API_KEY;
 
 function Main() {
   const [ingredients, setIngredients] = React.useState([]);
 
-  const [recipeShown, setRecipeShown] = React.useState(false);
+  const [recipe, setRecipe] = React.useState(false);
 
-  function toggleRecipeShown() {
-    setRecipeShown((prevShown) => !prevShown);
+  async function getRecipe() {
+    const recipeMarkdown = await getRecipeFromChefClaude(ingredients);
+    setRecipe(recipeMarkdown);
   }
 
   function addIngredient(formData) {
@@ -28,13 +32,10 @@ function Main() {
         <button>Add ingredient</button>
       </form>
       {ingredients.length > 0 && (
-        <IngredientsList
-          ingredients={ingredients}
-          toggleRecipeShown={toggleRecipeShown}
-        />
+        <IngredientsList ingredients={ingredients} getRecipe={getRecipe} />
       )}
 
-      {recipeShown && <Recipe />}
+      {recipe && <Recipe recipe={recipe} />}
     </main>
   );
 }
